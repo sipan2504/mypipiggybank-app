@@ -1,33 +1,53 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Piggy Bank - Doğrulama</title>
-    <meta name="description" content="Pi Piggy Bank uygulamasına giriş yapın ve Pi Network hesabınızı doğrulayın. Pi'lerinizi güvenle kilitleyin ve birikimlerinizi takip edin.">
-    <meta name="keywords" content="Pi Network, Pi Piggy Bank, Pi uygulaması, Pi doğrulama, Pi Coin, kripto para">
-    <meta name="author" content="Pi Piggy Bank">
+    <title>Pi Piggy Bank</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; }
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; margin: 0; }
         .container { max-width: 600px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #4a90e2; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #4a90e2; color: white; border: none; border-radius: 5px; margin-top: 20px; }
-        #verification-success { display: none; margin-top: 20px; }
-        #verification-success button { background-color: #5cb85c; }
+        .header { background-color: #4a90e2; color: white; padding: 20px; text-align: center; }
+        .card { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .balance { font-size: 2.5em; font-weight: bold; margin: 10px 0; color: #4a90e2; }
+        .button-group { display: flex; justify-content: space-around; margin-top: 20px; }
+        .button-group button { padding: 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; color: white; width: 45%; }
+        .lock-button { background-color: #f5a623; }
+        .history-button { background-color: #50e3c2; }
+        #app-page { display: none; } /* Uygulama sayfası başlangıçta gizli */
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-page" class="container">
         <h1>Pi Piggy Bank'e Hoş Geldiniz!</h1>
         <p>Devam etmeden önce Pi Network hesabınızı doğrulamanız gerekiyor.</p>
-        
-        <button id="verify-button" onclick="signInWithPi()">Pi ile Giriş Yap</button>
-        
-        <div id="verification-success">
-            <h2>Doğrulama Başarılı!</h2>
-            <p>Şimdi birikimlerinizi yönetmeye başlayabilirsiniz.</p>
-            <button onclick="redirectToApp()">Uygulamaya Git</button>
+        <button onclick="signInWithPi()">Pi ile Giriş Yap</button>
+    </div>
+
+    <div id="app-page">
+        <div class="header">
+            <h1>Pi Piggy Bank</h1>
+            <p>Hoş geldiniz, [Kullanıcı Adı]!</p>
+        </div>
+        <div class="container">
+            <div class="card">
+                <h3>Pi Bakiyeniz</h3>
+                <div class="balance">125.76 Pi</div>
+                <p>Güncel Pi bakiyenizi buradan takip edebilirsiniz.</p>
+            </div>
+            <div class="card">
+                <h3>Pi'lerinizi Kilitleyin</h3>
+                <p>Pi'lerinizi belirli bir süre kilitleyerek ödül kazanabilirsiniz.</p>
+                <div class="button-group">
+                    <button class="lock-button">Pi Kilitle</button>
+                    <button class="history-button">Kilitleme Geçmişi</button>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Birikimlerim</h3>
+                <p>Yaptığınız birikimlerin ve kazandığınız ödüllerin detaylı dökümü.</p>
+            </div>
         </div>
     </div>
 
@@ -52,24 +72,15 @@
                 },
                 onComplete: function(data) {
                     console.log("Doğrulama başarılı:", data);
-                    onVerificationSuccess();
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('app-page').style.display = 'block';
                 },
                 onCancel: function() {
                     alert("Doğrulama işlemi iptal edildi.");
                 }
             });
         }
-
-        function onVerificationSuccess() {
-            document.getElementById('verify-button').style.display = 'none';
-            document.getElementById('verification-success').style.display = 'block';
-        }
-
-        function redirectToApp() {
-            // Yönlendirme için en güvenilir metodu kullanırız
-            window.location.replace("https://mypipiggybank.netlify.app/app");
-        }
     </script>
 
 </body>
-</html>
+</html>    
