@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Piggy Bank - Uygulama</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 0; }
+        .header { background-color: #4a90e2; color: white; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .balance { font-size: 2.5em; font-weight: bold; margin: 10px 0; color: #4a90e2; }
+        .button-group { display: flex; justify-content: space-around; margin-top: 20px; }
+        .button-group button { padding: 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; color: white; width: 45%; }
+        .lock-button { background-color: #f5a623; }
+        .history-button { background-color: #50e3c2; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Pi Piggy Bank</h1>
+        <p>Hoş geldiniz, [Kullanıcı Adı]!</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="card">
+            <h3>Pi Bakiyeniz</h3>
+            <div class="balance">125.76 Pi</div>
+            <p>Güncel Pi bakiyenizi buradan takip edebilirsiniz.</p>
+        </div>
+
+        <div class="card">
+            <h3>Pi'lerinizi Kilitleyin</h3>
+            <p>Pi'lerinizi belirli bir süre kilitleyerek ödül kazanabilirsiniz.</p>
+            <div class="button-group">
+                <button class="lock-button">Pi Kilitle</button>
+                <button class="history-button">Kilitleme Geçmişi</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Birikimlerim</h3>
+            <p>Yaptığınız birikimlerin ve kazandığınız ödüllerin detaylı dökümü.</p>
+            </div>
+
+    </div>
+
+</body>
+</html>
