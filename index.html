@@ -15,6 +15,20 @@
         .lock-button { background-color: #f5a623; }
         .history-button { background-color: #50e3c2; }
         #app-page { display: none; } /* Uygulama sayfası başlangıçta gizli */
+        #message-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        #loading-indicator {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -23,14 +37,16 @@
     <div id="login-page" class="container">
         <h1>Pi Piggy Bank'e Hoş Geldiniz!</h1>
         <p>Devam etmeden önce Pi Network hesabınızı doğrulamanız gerekiyor.</p>
-        <button onclick="signInWithPi()">Pi ile Giriş Yap</button>
+        <button id="auth-button" onclick="signInWithPi()">Pi ile Giriş Yap</button>
+        <div id="loading-indicator">Yükleniyor...</div>
+        <div id="message-box"></div>
     </div>
 
     <!-- UYGULAMA SAYFASI -->
     <div id="app-page">
         <div class="header">
             <h1>Pi Piggy Bank</h1>
-            <p>Hoş geldiniz, [Kullanıcı Adı]!</p>
+            <p id="welcome-message">Hoş geldiniz, [Kullanıcı Adı]!</p>
         </div>
         <div class="container">
             <div class="card">
@@ -58,32 +74,70 @@
     <script>
         const PI_API_KEY = "2ac56e27e9973c84031c041867ab3cce7f7286be1d57d842c4405bbf366b601d9b7ddeb16ddc0c6a0e0a08706c170d168ea1fe40eccbfe6cb2ce8725a83afa10";
         
-        Pi.init({
-            version: "2.0",
-            api_key: PI_API_KEY,
-            onReady: function() {
-                console.log("Pi SDK hazır.");
-            }
-        });
+        function showMessage(message, isError = false) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.innerText = message;
+            msgBox.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+            msgBox.style.color = isError ? '#721c24' : '#155724';
+            msgBox.style.display = 'block';
+        }
 
-        function signInWithPi() {
-            Pi.authenticate({
-                scopes: ['username'],
-                onIncomplete: function(data) {
-                    alert("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.");
-                },
-                onComplete: function(data) {
-                    console.log("Doğrulama başarılı:", data);
-                    document.getElementById('login-page').style.display = 'none';
-                    document.getElementById('app-page').style.display = 'block';
-                },
-                onCancel: function() {
-                    alert("Doğrulama işlemi iptal edildi.");
+        function toggleLoading(isLoading) {
+            const button = document.getElementById('auth-button');
+            const loader = document.getElementById('loading-indicator');
+            button.style.display = isLoading ? 'none' : 'block';
+            loader.style.display = isLoading ? 'block' : 'none';
+        }
+
+        // Pi SDK'sının yüklenip yüklenmediğini kontrol et
+        if (typeof Pi !== 'undefined') {
+            Pi.init({
+                version: "2.0",
+                api_key: PI_API_KEY,
+                onReady: function() {
+                    console.log("Pi SDK hazır.");
+                    showMessage("Pi SDK hazır. Giriş yapabilirsiniz.");
                 }
             });
+        } else {
+            console.error("Pi SDK yüklenemedi. `pi-sdk.js` dosyasına erişim hatası olabilir.");
+            showMessage("Pi SDK yüklenemedi. Lütfen Pi Browser'da olduğunuzdan emin olun ve internet bağlantınızı kontrol edin.", true);
+        }
+
+        function signInWithPi() {
+            toggleLoading(true);
+            try {
+                Pi.authenticate({
+                    scopes: ['username'],
+                    onIncomplete: function(data) {
+                        toggleLoading(false);
+                        console.log("Doğrulama tamamlanmadı:", data);
+                        showMessage("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.", true);
+                    },
+                    onComplete: function(data) {
+                        toggleLoading(false);
+                        console.log("Doğrulama başarılı:", data);
+                        showMessage("Giriş başarılı! Uygulama sayfası yükleniyor...");
+                        
+                        document.getElementById('login-page').style.display = 'none';
+                        document.getElementById('app-page').style.display = 'block';
+                        
+                        const username = data.user.username || "[Kullanıcı Adı]";
+                        document.getElementById('welcome-message').innerText = `Hoş geldiniz, ${username}!`;
+                    },
+                    onCancel: function() {
+                        toggleLoading(false);
+                        console.log("Doğrulama işlemi iptal edildi.");
+                        showMessage("Doğrulama işlemi iptal edildi.", true);
+                    }
+                });
+            } catch (error) {
+                toggleLoading(false);
+                console.error("Kimlik doğrulama sırasında bir hata oluştu:", error);
+                showMessage(`Beklenmedik bir hata oluştu: ${error.message}`, true);
+            }
         }
     </script>
 
 </body>
 </html>
-
