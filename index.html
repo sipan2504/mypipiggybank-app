@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Piggy Bank - Doğrulama</title>
+    <meta name="description" content="Pi Piggy Bank uygulamasına giriş yapın ve Pi Network hesabınızı doğrulayın. Pi'lerinizi güvenle kilitleyin ve birikimlerinizi takip edin.">
+    <meta name="keywords" content="Pi Network, Pi Piggy Bank, Pi uygulaması, Pi doğrulama, Pi Coin, kripto para">
+    <meta name="author" content="Pi Piggy Bank">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #4a90e2; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #4a90e2; color: white; border: none; border-radius: 5px; margin-top: 20px; }
+        #verification-success { display: none; margin-top: 20px; }
+        #verification-success button { background-color: #5cb85c; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Pi Piggy Bank'e Hoş Geldiniz!</h1>
+        <p>Devam etmeden önce Pi Network hesabınızı doğrulamanız gerekiyor.</p>
+        
+        <button id="verify-button" onclick="signInWithPi()">Pi ile Giriş Yap</button>
+        
+        <div id="verification-success">
+            <h2>Doğrulama Başarılı!</h2>
+            <p>Şimdi birikimlerinizi yönetmeye başlayabilirsiniz.</p>
+            <button onclick="redirectToApp()">Uygulamaya Git</button>
+        </div>
+    </div>
+
+    <script src="https://sdk.minepi.com/v2/pi-sdk.js"></script>
+
+    <script>
+        const PI_API_KEY = "2ac56e27e9973c84031c041867ab3cce7f7286be1d57d842c4405bbf366b601d9b7ddeb16ddc0c6a0e0a08706c170d168ea1fe40eccbfe6cb2ce8725a83afa10";
+        
+        Pi.init({
+            version: "2.0",
+            api_key: PI_API_KEY,
+            onReady: function() {
+                console.log("Pi SDK hazır.");
+            }
+        });
+
+        function signInWithPi() {
+            Pi.authenticate({
+                scopes: ['username'],
+                onIncomplete: function(data) {
+                    alert("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.");
+                },
+                onComplete: function(data) {
+                    console.log("Doğrulama başarılı:", data);
+                    onVerificationSuccess();
+                },
+                onCancel: function() {
+                    alert("Doğrulama işlemi iptal edildi.");
+                }
+            });
+        }
+
+        function onVerificationSuccess() {
+            document.getElementById('verify-button').style.display = 'none';
+            document.getElementById('verification-success').style.display = 'block';
+        }
+
+        function redirectToApp() {
+            window.location.href = "https://mypipiggybank.netlify.app/app";
+        }
+    </script>
+
+</body>
+</html>
