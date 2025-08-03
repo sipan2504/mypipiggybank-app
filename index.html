@@ -1,143 +1,169 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Piggy Bank</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; margin: 0; }
-        .container { max-width: 600px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header { background-color: #4a90e2; color: white; padding: 20px; text-align: center; }
-        .card { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .balance { font-size: 2.5em; font-weight: bold; margin: 10px 0; color: #4a90e2; }
-        .button-group { display: flex; justify-content: space-around; margin-top: 20px; }
-        .button-group button { padding: 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; color: white; width: 45%; }
-        .lock-button { background-color: #f5a623; }
-        .history-button { background-color: #50e3c2; }
-        #app-page { display: none; } /* Uygulama sayfası başlangıçta gizli */
-        #message-box {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-        }
-        #loading-indicator {
-            margin-top: 10px;
-            font-style: italic;
-            color: #555;
-            display: none;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Piggy Bank for Pi</title>
+    <style>
+        /* Genel stil ayarları */
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; margin: 0; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { background-color: #4a90e2; color: white; padding: 20px; text-align: center; }
+        .card { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .balance { font-size: 2.5em; font-weight: bold; margin: 10px 0; color: #4a90e2; }
+        .button-group { display: flex; justify-content: space-around; margin-top: 20px; }
+        .button-group button { padding: 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; color: white; width: 45%; }
+        .lock-button { background-color: #f5a623; }
+        .history-button { background-color: #50e3c2; }
+        #app-page { display: none; } /* Uygulama sayfası başlangıçta gizli */
+        #message-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        #loading-indicator {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- GİRİŞ SAYFASI -->
-    <div id="login-page" class="container">
-        <h1>Pi Piggy Bank'e Hoş Geldiniz!</h1>
-        <p>Devam etmeden önce Pi Network hesabınızı doğrulamanız gerekiyor.</p>
-        <button id="auth-button" onclick="signInWithPi()">Pi ile Giriş Yap</button>
-        <div id="loading-indicator">Yükleniyor...</div>
-        <div id="message-box"></div>
-    </div>
+    <!-- GİRİŞ SAYFASI -->
+    <div id="login-page" class="container">
+        <h1>Global Piggy Bank for Pi'ye Hoş Geldiniz!</h1>
+        <p>Devam etmeden önce Pi Network hesabınızı doğrulamanız gerekiyor.</p>
+        <!-- TIKLAMA OLAYI ARTIK JAVASCRIPT KODU İÇİNDEN YÖNETİLİYOR -->
+        <button id="auth-button">Pi ile Giriş Yap</button>
+        <div id="loading-indicator">Yükleniyor...</div>
+        <div id="message-box"></div>
+    </div>
 
-    <!-- UYGULAMA SAYFASI -->
-    <div id="app-page">
-        <div class="header">
-            <h1>Pi Piggy Bank</h1>
-            <p id="welcome-message">Hoş geldiniz, [Kullanıcı Adı]!</p>
-        </div>
-        <div class="container">
-            <div class="card">
-                <h3>Pi Bakiyeniz</h3>
-                <div class="balance">125.76 Pi</div>
-                <p>Güncel Pi bakiyenizi buradan takip edebilirsiniz.</p>
-            </div>
-            <div class="card">
-                <h3>Pi'lerinizi Kilitleyin</h3>
-                <p>Pi'lerinizi belirli bir süre kilitleyerek ödül kazanabilirsiniz.</p>
-                <div class="button-group">
-                    <button class="lock-button">Pi Kilitle</button>
-                    <button class="history-button">Kilitleme Geçmişi</button>
-                </div>
-            </div>
-            <div class="card">
-                <h3>Birikimlerim</h3>
-                <p>Yaptığınız birikimlerin ve kazandığınız ödüllerin detaylı dökümü.</p>
-            </div>
-        </div>
-    </div>
+    <!-- UYGULAMA SAYFASI -->
+    <div id="app-page">
+        <div class="header">
+            <h1>Global Piggy Bank for Pi</h1>
+            <p id="welcome-message">Hoş geldiniz, [Kullanıcı Adı]!</p>
+        </div>
+        <div class="container">
+            <div class="card">
+                <h3>Pi Bakiyeniz</h3>
+                <div class="balance">125.76 Pi</div>
+                <p>Güncel Pi bakiyenizi buradan takip edebilirsiniz.</p>
+            </div>
+            <div class="card">
+                <h3>Pi'lerinizi Kilitleyin</h3>
+                <p>Pi'lerinizi belirli bir süre kilitleyerek ödül kazanabilirsiniz.</p>
+                <div class="button-group">
+                    <button class="lock-button">Pi Kilitle</button>
+                    <button class="history-button">Kilitleme Geçmişi</button>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Birikimlerim</h3>
+                <p>Yaptığınız birikimlerin ve kazandığınız ödüllerin detaylı dökümü.</p>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://sdk.minepi.com/v2/pi-sdk.js"></script>
+    <!-- Pi SDK yükleme script'i -->
+    <script src="https://sdk.minepi.com/v2/pi-sdk.js"></script>
 
-    <script>
-        const PI_API_KEY = "2ac56e27e9973c84031c041867ab3cce7f7286be1d57d842c4405bbf366b601d9b7ddeb16ddc0c6a0e0a08706c170d168ea1fe40eccbfe6cb2ce8725a83afa10";
-        
-        function showMessage(message, isError = false) {
-            const msgBox = document.getElementById('message-box');
-            msgBox.innerText = message;
-            msgBox.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
-            msgBox.style.color = isError ? '#721c24' : '#155724';
-            msgBox.style.display = 'block';
-        }
+    <!-- Uygulama mantığı -->
+    <script>
+        // Mesaj kutusunu göstermek için yardımcı fonksiyon
+        function showMessage(message, isError = false) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.innerText = message;
+            msgBox.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+            msgBox.style.color = isError ? '#721c24' : '#155724';
+            msgBox.style.display = 'block';
+        }
 
-        function toggleLoading(isLoading) {
-            const button = document.getElementById('auth-button');
-            const loader = document.getElementById('loading-indicator');
-            button.style.display = isLoading ? 'none' : 'block';
-            loader.style.display = isLoading ? 'block' : 'none';
-        }
+        // Yükleniyor durumunu yönetmek için yardımcı fonksiyon
+        function toggleLoading(isLoading) {
+            const button = document.getElementById('auth-button');
+            const loader = document.getElementById('loading-indicator');
+            button.style.display = isLoading ? 'none' : 'block';
+            loader.style.display = isLoading ? 'block' : 'none';
+        }
+        
+        // Pi ile giriş yapma fonksiyonu
+        function signInWithPi() {
+            toggleLoading(true);
+            try {
+                // Pi nesnesinin varlığını kontrol et
+                if (typeof Pi === 'undefined' || !Pi.authenticate) {
+                    console.error("Pi nesnesi veya authenticate metodu tanımlı değil.");
+                    showMessage("Pi SDK yüklenemedi. Lütfen Pi Browser'da olduğunuzdan emin olun ve internet bağlantınızı kontrol edin.", true);
+                    toggleLoading(false);
+                    return;
+                }
 
-        // Pi SDK'sının yüklenip yüklenmediğini kontrol et
-        if (typeof Pi !== 'undefined') {
-            Pi.init({
-                version: "2.0",
-                api_key: PI_API_KEY,
-                onReady: function() {
-                    console.log("Pi SDK hazır.");
-                    showMessage("Pi SDK hazır. Giriş yapabilirsiniz.");
-                }
-            });
-        } else {
-            console.error("Pi SDK yüklenemedi. `pi-sdk.js` dosyasına erişim hatası olabilir.");
-            showMessage("Pi SDK yüklenemedi. Lütfen Pi Browser'da olduğunuzdan emin olun ve internet bağlantınızı kontrol edin.", true);
-        }
+                Pi.authenticate({
+                    scopes: ['username'],
+                    onIncomplete: function(data) {
+                        toggleLoading(false);
+                        console.log("Doğrulama tamamlanmadı:", data);
+                        showMessage("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.", true);
+                    },
+                    onComplete: function(data) {
+                        toggleLoading(false);
+                        console.log("Doğrulama başarılı:", data);
+                        showMessage("Giriş başarılı! Uygulama sayfası yükleniyor...");
+                        
+                        document.getElementById('login-page').style.display = 'none';
+                        document.getElementById('app-page').style.display = 'block';
+                        
+                        const username = data.user.username || "[Kullanıcı Adı]";
+                        document.getElementById('welcome-message').innerText = `Hoş geldiniz, ${username}!`;
+                    },
+                    onCancel: function() {
+                        toggleLoading(false);
+                        console.log("Doğrulama işlemi iptal edildi.");
+                        showMessage("Doğrulama işlemi iptal edildi.", true);
+                    }
+                });
+            } catch (error) {
+                toggleLoading(false);
+                console.error("Kimlik doğrulama sırasında bir hata oluştu:", error);
+                showMessage(`Beklenmedik bir hata oluştu: ${error.message}`, true);
+            }
+        }
 
-        function signInWithPi() {
-            toggleLoading(true);
-            try {
-                Pi.authenticate({
-                    scopes: ['username'],
-                    onIncomplete: function(data) {
-                        toggleLoading(false);
-                        console.log("Doğrulama tamamlanmadı:", data);
-                        showMessage("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.", true);
-                    },
-                    onComplete: function(data) {
-                        toggleLoading(false);
-                        console.log("Doğrulama başarılı:", data);
-                        showMessage("Giriş başarılı! Uygulama sayfası yükleniyor...");
-                        
-                        document.getElementById('login-page').style.display = 'none';
-                        document.getElementById('app-page').style.display = 'block';
-                        
-                        const username = data.user.username || "[Kullanıcı Adı]";
-                        document.getElementById('welcome-message').innerText = `Hoş geldiniz, ${username}!`;
-                    },
-                    onCancel: function() {
-                        toggleLoading(false);
-                        console.log("Doğrulama işlemi iptal edildi.");
-                        showMessage("Doğrulama işlemi iptal edildi.", true);
-                    }
-                });
-            } catch (error) {
-                toggleLoading(false);
-                console.error("Kimlik doğrulama sırasında bir hata oluştu:", error);
-                showMessage(`Beklenmedik bir hata oluştu: ${error.message}`, true);
-            }
-        }
-    </script>
+        // DOM yüklendikten sonra ve Pi SDK hazır olduğunda başlatma işlemini yap
+        document.addEventListener('DOMContentLoaded', () => {
+            const authButton = document.getElementById('auth-button');
+
+            if (typeof Pi !== 'undefined') {
+                try {
+                    Pi.init({
+                        version: "2.0",
+                        app_id: "global-piggybank-for-pi",
+                        onReady: function() {
+                            console.log("Pi SDK hazır.");
+                            showMessage("Pi SDK hazır. Giriş yapabilirsiniz.");
+                            // SDK hazır olduğunda butona tıklama olayını ekle
+                            authButton.addEventListener('click', signInWithPi);
+                        }
+                    });
+                } catch (error) {
+                    console.error("Pi SDK başlatılırken bir hata oluştu:", error);
+                    showMessage(`Pi SDK başlatma hatası: ${error.message}`, true);
+                }
+            } else {
+                console.error("Pi SDK yüklenemedi. `pi-sdk.js` dosyasına erişim hatası olabilir.");
+                showMessage("Pi SDK yüklenemedi. Lütfen Pi Browser'da olduğunuzdan emin olun ve internet bağlantınızı kontrol edin.", true);
+                // SDK yüklenemediğinde bile butona tıklama olayı eklendi, böylece hata mesajı gösterilebilir
+                authButton.addEventListener('click', signInWithPi);
+            }
+        });
+    </script>
 
 </body>
 </html>
