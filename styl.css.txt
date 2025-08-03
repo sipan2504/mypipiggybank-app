@@ -1,0 +1,3 @@
+﻿document.getElementById('payButton').addEventListener('click', function () {
+  alert('This would initiate a Pi payment in a real Pi app.');
+});

@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Global PiggyBank for Pi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Global PiggyBank for Pi</h1>
+    <p>Lock your earnings, boost power!</p>
+    <button id="payButton">Pay with Pi</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
