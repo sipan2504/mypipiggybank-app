@@ -1,453 +1,57 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Piggy Bank for Pi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Genel stil ayarları */
-        body { font-family: 'Inter', sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; color: #333; margin: 0; }
-        .container { max-width: 600px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header { background-color: #4a90e2; color: white; padding: 20px; text-align: center; }
-        .card { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .balance { font-size: 2.5em; font-weight: bold; margin: 10px 0; color: #4a90e2; }
-        .button-group { display: flex; justify-content: space-around; margin-top: 20px; }
-        .button-group button { padding: 15px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; color: white; width: 45%; }
-        .lock-button { background-color: #f5a623; }
-        .history-button { background-color: #50e3c2; }
-        #app-page { display: none; } /* Uygulama sayfası başlangıçta gizli */
-        .message-box {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-            display: none;
-        }
-        #pi-browser-warning {
-            background-color: #ffcccc;
-            color: #cc0000;
-            padding: 20px;
-            font-weight: bold;
-            display: none;
-        }
-        #loading-indicator {
-            margin-top: 10px;
-            font-style: italic;
-            color: #555;
-            display: none;
-        }
-        .plan-input, .prediction-input { width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; resize: vertical; }
-        .gemini-button { background-color: #7252f3; width: 100%; padding: 15px; font-size: 16px; border-radius: 5px; color: white; cursor: pointer; }
-        .plan-output, .prediction-output { margin-top: 20px; text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
-        .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid white; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: auto; }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .tts-button { background-color: #4299e1; padding: 10px; font-size: 14px; border-radius: 5px; color: white; cursor: pointer; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Global PiggyBank for Pi</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #4A90E2;
+    }
+    p {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+    .pi-button {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #F5A623;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .pi-button:hover {
+      background-color: #e6991e;
+    }
+  </style>
 </head>
 <body>
-
-    <!-- GİRİŞ SAYFASI -->
-    <div id="login-page" class="container">
-        <h1>Global Piggy Bank for Pi'ye Hoş Geldiniz!</h1>
-        <p>Devam etmek için Pi Network hesabınızı doğrulamanız gerekiyor.</p>
-        <div id="pi-browser-warning">
-            Bu uygulama yalnızca **Pi Browser** içinde çalışır.
-            Lütfen uygulamayı Pi Browser'da açın.
-        </div>
-        <button id="auth-button" disabled>Pi ile Giriş Yap</button>
-        <div id="loading-indicator">Yükleniyor...</div>
-        <div id="message-box" class="message-box"></div>
-    </div>
-
-    <!-- UYGULAMA SAYFASI -->
-    <div id="app-page">
-        <div class="header">
-            <h1>Global Piggy Bank for Pi</h1>
-            <p id="welcome-message">Hoş geldiniz, [Kullanıcı Adı]!</p>
-        </div>
-        <div class="container">
-            <div class="card">
-                <h3>Pi Bakiyeniz</h3>
-                <div class="balance">125.76 Pi</div>
-                <p>Güncel Pi bakiyenizi buradan takip edebilirsiniz.</p>
-            </div>
-            <div class="card">
-                <h3>Pi'lerinizi Kilitleyin</h3>
-                <p>Pi'lerinizi belirli bir süre kilitleyerek ödül kazanabilirsiniz.</p>
-                <div class="button-group">
-                    <button class="lock-button">Pi Kilitle</button>
-                    <button class="history-button">Kilitleme Geçmişi</button>
-                </div>
-            </div>
-            <!-- Gemini API destekli birikim planı özelliği -->
-            <div class="card">
-                <h3>Hedeflerinize Ulaşın ✨</h3>
-                <p>Birikim hedefinizi girin, Gemini size özel bir plan oluştursun!</p>
-                <textarea id="plan-goal-input" class="plan-input" placeholder="Örnek: 100 Pi biriktirmek"></textarea>
-                <button id="generate-plan-button" class="gemini-button">Plan Oluştur ✨</button>
-                <div id="plan-output" class="plan-output hidden"></div>
-                <button id="read-plan-button" class="tts-button hidden">Planı Seslendir 🔊</button>
-            </div>
-            <!-- Gemini API destekli Pi değeri tahmin özelliği -->
-            <div class="card">
-                <h3>Pi Değeri Tahmin Aracı ✨</h3>
-                <p>Pi'nin geleceği veya olası değeri hakkında bir soru sorun. (Bu bir finansal tavsiye değildir.)</p>
-                <textarea id="prediction-question-input" class="prediction-input" placeholder="Örnek: Pi'nin değeri 2025'in sonuna kadar ne kadar olabilir?"></textarea>
-                <button id="get-prediction-button" class="gemini-button">Tahmin Al ✨</button>
-                <div id="prediction-output" class="prediction-output hidden"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pi SDK yükleme script'i -->
-    <!-- Bu script'in sadece Pi Browser'da yükleneceğini unutmayın -->
-    <script id="pi-sdk-script" src="https://sdk.minepi.com/v2/pi-sdk.js" async></script>
-
-    <!-- Uygulama mantığı -->
-    <script>
-        // Mesaj kutusunu göstermek için yardımcı fonksiyon
-        function showMessage(message, isError = false, targetId = 'message-box') {
-            const msgBox = document.getElementById(targetId);
-            msgBox.innerText = message;
-            msgBox.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
-            msgBox.style.color = isError ? '#721c24' : '#155724';
-            msgBox.style.display = 'block';
-        }
-
-        // Yükleme durumunu yönetmek için yardımcı fonksiyon
-        function toggleLoading(isLoading) {
-            const button = document.getElementById('auth-button');
-            const loader = document.getElementById('loading-indicator');
-            button.disabled = isLoading;
-            loader.style.display = isLoading ? 'block' : 'none';
-        }
-
-        // Gemini API için yükleme durumunu yönetme (Birikim planı)
-        function togglePlanLoading(isLoading) {
-            const button = document.getElementById('generate-plan-button');
-            const outputDiv = document.getElementById('plan-output');
-            const readButton = document.getElementById('read-plan-button');
-            if (isLoading) {
-                button.disabled = true;
-                button.innerHTML = '<div class="spinner"></div>';
-                outputDiv.innerText = 'Plan oluşturuluyor...';
-                outputDiv.style.display = 'block';
-                readButton.classList.add('hidden');
-            } else {
-                button.disabled = false;
-                button.innerHTML = 'Plan Oluştur ✨';
-            }
-        }
-        
-        // Gemini API için yükleme durumunu yönetme (Pi değeri tahmini)
-        function togglePredictionLoading(isLoading) {
-            const button = document.getElementById('get-prediction-button');
-            const outputDiv = document.getElementById('prediction-output');
-            if (isLoading) {
-                button.disabled = true;
-                button.innerHTML = '<div class="spinner"></div>';
-                outputDiv.innerText = 'Tahmin alınıyor...';
-                outputDiv.style.display = 'block';
-            } else {
-                button.disabled = false;
-                button.innerHTML = 'Tahmin Al ✨';
-            }
-        }
-
-        // Pi ile giriş yapma fonksiyonu
-        function signInWithPi() {
-            toggleLoading(true);
-            try {
-                // Pi nesnesinin varlığını kontrol et
-                if (typeof Pi !== 'undefined') {
-                    Pi.authenticate({
-                        scopes: ['username'],
-                        onIncomplete: function(data) {
-                            toggleLoading(false);
-                            console.log("Doğrulama tamamlanmadı:", data);
-                            showMessage("Doğrulama işlemi tamamlanmadı. Lütfen tekrar deneyin.", true);
-                        },
-                        onComplete: function(data) {
-                            toggleLoading(false);
-                            console.log("Doğrulama başarılı:", data);
-                            showMessage("Giriş başarılı! Uygulama sayfası yükleniyor...");
-                            
-                            document.getElementById('login-page').style.display = 'none';
-                            document.getElementById('app-page').style.display = 'block';
-                            
-                            const username = data.user.username || "[Kullanıcı Adı]";
-                            document.getElementById('welcome-message').innerText = `Hoş geldiniz, ${username}!`;
-                        },
-                        onCancel: function() {
-                            toggleLoading(false);
-                            console.log("Doğrulama işlemi iptal edildi.");
-                            showMessage("Doğrulama işlemi iptal edildi.", true);
-                        }
-                    });
-                } else {
-                    toggleLoading(false);
-                    // Bu senaryo normalde `onload` event'i sayesinde gerçekleşmeyecek
-                    // ancak yine de bir güvenlik önlemi olarak kalmalıdır.
-                    showMessage("Pi SDK bulunamadı. Lütfen bu uygulamayı Pi Browser'da açın.", true);
-                }
-            } catch (error) {
-                toggleLoading(false);
-                console.error("Kimlik doğrulama sırasında bir hata oluştu:", error);
-                showMessage(`Beklenmedik bir hata oluştu: ${error.message}`, true);
-            }
-        }
-        
-        // Gemini API kullanarak birikim planı oluşturan fonksiyon
-        async function generateSavingsPlan() {
-            const goalInput = document.getElementById('plan-goal-input').value;
-            const outputDiv = document.getElementById('plan-output');
-
-            if (goalInput.trim() === "") {
-                outputDiv.innerText = "Lütfen bir birikim hedefi girin.";
-                outputDiv.style.display = 'block';
-                return;
-            }
-
-            togglePlanLoading(true);
-            
-            try {
-                const prompt = `Birikim hedefim: ${goalInput}. Bir Pi Network finansal danışmanı gibi davranarak bu hedefe ulaşmam için bana haftalık, aylık ve uzun vadeli adımları içeren detaylı bir plan oluştur. Plan Pi cüzdanımdaki Pi birikimine odaklanmalıdır. Maddeler halinde yanıt ver ve anlaşılır bir dil kullan.`;
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                const payload = { contents: chatHistory };
-                const apiKey = "" 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    outputDiv.innerText = text;
-                    document.getElementById('read-plan-button').classList.remove('hidden');
-                } else {
-                    outputDiv.innerText = "Bir plan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.";
-                }
-
-            } catch (error) {
-                console.error("Gemini API çağrısı sırasında bir hata oluştu:", error);
-                outputDiv.innerText = `Beklenmedik bir hata oluştu: ${error.message}`;
-            } finally {
-                togglePlanLoading(false);
-            }
-        }
-
-        // Gemini API kullanarak Pi değeri tahmini yapan fonksiyon
-        async function getPiValuePrediction() {
-            const questionInput = document.getElementById('prediction-question-input').value;
-            const outputDiv = document.getElementById('prediction-output');
-
-            if (questionInput.trim() === "") {
-                outputDiv.innerText = "Lütfen bir soru girin.";
-                outputDiv.style.display = 'block';
-                return;
-            }
-
-            togglePredictionLoading(true);
-
-            try {
-                const prompt = `Bu bir finansal tavsiye değildir. Sadece tahmine dayalı bir analizdir. Soru: ${questionInput}. Bu soruya bir kripto para analisti gibi davranarak, Pi Network'ün güncel durumu ve piyasa trendleri hakkında bilgi vererek spekülatif bir tahmin yap. Cevabını bir paragraf halinde ve net bir şekilde belirt.`;
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                const payload = { contents: chatHistory };
-                const apiKey = "" 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    outputDiv.innerText = text;
-                } else {
-                    outputDiv.innerText = "Bir tahmin oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.";
-                }
-
-            } catch (error) {
-                console.error("Gemini API çağrısı sırasında bir hata oluştu:", error);
-                outputDiv.innerText = `Beklenmedik bir hata oluştu: ${error.message}`;
-            } finally {
-                togglePredictionLoading(false);
-            }
-        }
-
-        // PCM verisini WAV formatına dönüştüren yardımcı fonksiyon
-        function pcmToWav(pcmData, sampleRate) {
-            const pcm16 = new Int16Array(pcmData);
-            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
-            const view = new DataView(buffer);
-
-            // WAV başlığı
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + pcm16.length * 2, true);
-            writeString(view, 8, 'WAVE');
-            
-            // FMT chunk
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true); // Linear PCM
-            view.setUint16(22, 1, true); // Mono
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true); // Byte Rate
-            view.setUint16(32, 2, true); // Block Align
-            view.setUint16(34, 16, true); // Bits per sample
-            
-            // Data chunk
-            writeString(view, 36, 'data');
-            view.setUint32(40, pcm16.length * 2, true);
-
-            // PCM verisi
-            for (let i = 0; i < pcm16.length; i++) {
-                view.setInt16(44 + i * 2, pcm16[i], true);
-            }
-
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        }
-        
-        function base64ToArrayBuffer(base64) {
-            const binary_string = window.atob(base64);
-            const len = binary_string.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binary_string.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-
-        // Gemini TTS API kullanarak planı seslendiren fonksiyon
-        async function readPlanAloud() {
-            const planText = document.getElementById('plan-output').innerText;
-            const audio = new Audio();
-            const readButton = document.getElementById('read-plan-button');
-            
-            if (!planText || planText.length < 50) {
-                showMessage("Seslendirilecek yeterli metin yok.", true);
-                return;
-            }
-
-            readButton.disabled = true;
-            readButton.innerText = "Seslendiriliyor...";
-            
-            try {
-                const prompt = planText;
-                const payload = {
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName: "Kore" }
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-                
-                const apiKey = ""; // Canvas'dan otomatik olarak sağlanacak
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                
-                const audioData = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                const mimeType = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
-
-                if (audioData && mimeType && mimeType.startsWith("audio/")) {
-                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const wavBlob = pcmToWav(pcmData, sampleRate);
-                    const audioUrl = URL.createObjectURL(wavBlob);
-                    audio.src = audioUrl;
-                    audio.play();
-                } else {
-                    showMessage("Ses oluşturulurken bir hata oluştu.", true);
-                }
-
-            } catch (error) {
-                console.error("TTS API çağrısı sırasında bir hata oluştu:", error);
-                showMessage(`Seslendirme sırasında beklenmedik bir hata oluştu: ${error.message}`, true);
-            } finally {
-                readButton.disabled = false;
-                readButton.innerText = "Planı Seslendir 🔊";
-            }
-        }
-
-        // DOM yüklendikten sonra tüm script'leri başlat
-        document.addEventListener('DOMContentLoaded', () => {
-            const authButton = document.getElementById('auth-button');
-            const generatePlanButton = document.getElementById('generate-plan-button');
-            const getPredictionButton = document.getElementById('get-prediction-button');
-            const readPlanButton = document.getElementById('read-plan-button');
-            
-            // Pi SDK'sının yüklü olup olmadığını kontrol et
-            if (typeof Pi !== 'undefined') {
-                document.getElementById('pi-browser-warning').style.display = 'none';
-                try {
-                    Pi.init({
-                        version: "2.0",
-                        app_id: "global-piggybank-for-pi",
-                        onReady: function() {
-                            console.log("Pi SDK hazır.");
-                            authButton.disabled = false;
-                            authButton.addEventListener('click', signInWithPi);
-                        }
-                    });
-                } catch (error) {
-                    console.error("Pi SDK başlatılırken bir hata oluştu:", error);
-                    showMessage(`Pi SDK başlatma hatası: ${error.message}`, true, 'message-box');
-                }
-            } else {
-                // Pi SDK yoksa uyarıyı göster
-                document.getElementById('pi-browser-warning').style.display = 'block';
-                authButton.disabled = true;
-                authButton.innerText = "Pi Browser'da Açın";
-                authButton.addEventListener('click', () => {
-                    alert("Bu uygulama yalnızca Pi Browser içinde çalışır.");
-                });
-            }
-            
-            // Diğer özelliklerin olay dinleyicilerini ekle (bunlar Pi'ye bağımlı değil)
-            generatePlanButton.addEventListener('click', generateSavingsPlan);
-            getPredictionButton.addEventListener('click', getPiValuePrediction);
-            readPlanButton.addEventListener('click', readPlanAloud);
-        });
-    </script>
+  <div class="container">
+    <h1>Global Piggy Bank for Pi'ye Hoş Geldiniz!</h1>
+    <p>Devam etmek için Pi Network hesabınızı doğrulamanız gerekiyor.</p>
+    <p>Bu uygulama yalnızca <strong>Pi Browser</strong> içinde çalışır.<br>Lütfen uygulamayı Pi Browser'da açın.</p>
+    <a href="pi://mypipiggybank2091.pi" class="pi-button">Pi Browser'da Açın</a>
+  </div>
 </body>
 </html>
